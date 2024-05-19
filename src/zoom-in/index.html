@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Canvas Zoom Circle</title>
+  <style>
+    #myCanvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="myCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.src = 'https://images.pexels.com/photos/12043242/pexels-photo-12043242.jpeg';
+    img.crossOrigin = 'Anonymous';
+
+    img.onload = function () {
+      // Set canvas size to match the image size
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // Draw the image onto the canvas
+      ctx.drawImage(img, 0, 0);
+
+      // Add event listener for click to zoom in on click position
+      canvas.addEventListener('mousemove', function (event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        // zoomInCircle(x, y);
+        // zoomInMatrixPixels(x, y);
+        // zoomInCirclePixels(x, y);
+        zoomInCirclePixelsSquare(x, y);
+      });
+    };
+
+    img.onerror = function () {
+      console.error('Failed to load the image.');
+    };
+
+    function zoomInCircle(centerX, centerY) {
+      const zoomRadius = 50; // Radius of the circular zoom area
+      const zoomFactor = 3; // Zoom level
+
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Draw the original image
+      ctx.drawImage(img, 0, 0);
+      // Save the current context state
+      ctx.save();
+
+      // Create a circular clipping path
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, zoomRadius, 0, 2 * Math.PI);
+      ctx.clip();
+
+      // Calculate the source rectangle for the zoomed area
+      const srcX = centerX - zoomRadius / zoomFactor;
+      const srcY = centerY - zoomRadius / zoomFactor;
+      const srcWidth = 2 * zoomRadius / zoomFactor;
+      const srcHeight = 2 * zoomRadius / zoomFactor;
+
+      // Draw the zoomed image into the clipped area
+      ctx.drawImage(img, srcX, srcY, srcWidth, srcHeight, centerX - zoomRadius, centerY - zoomRadius, 2 * zoomRadius, 2 * zoomRadius);
+
+      // Restore the context to remove the clipping path
+      ctx.restore();
+    }
+
+    function zoomInMatrixPixels(centerX, centerY) {
+      const zoomRadius = 60; // Radius of the circular zoom area
+      const pixelSize = 10; // Size of each pixel in the matrix display
+
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw the original image
+      ctx.drawImage(img, 0, 0);
+
+      // Get the image data from the zoomed area
+      const imageData = ctx.getImageData(centerX - zoomRadius, centerY - zoomRadius, 2 * zoomRadius, 2 * zoomRadius);
+      const data = imageData.data;
+
+      // Save the current context state
+      ctx.save();
+
+      // Create a circular clipping path
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, zoomRadius, 0, 2 * Math.PI);
+      ctx.clip();
+
+      // Draw each pixel as a rectangle in the zoomed area
+      for (let y = 0; y < 2 * zoomRadius; y++) {
+        for (let x = 0; x < 2 * zoomRadius; x++) {
+          const index = (y * 2 * zoomRadius + x) * 4;
+          const red = data[index];
+          const green = data[index + 1];
+          const blue = data[index + 2];
+          const alpha = data[index + 3] / 255;
+
+          // Set the fill style to the pixel's color
+          ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+          // Calculate the position for the pixel matrix
+          const pixelX = centerX + (x - zoomRadius) * pixelSize / zoomRadius;
+          const pixelY = centerY + (y - zoomRadius) * pixelSize / zoomRadius;
+          // Draw the rectangle for the pixel
+          ctx.fillRect(pixelX, pixelY, pixelSize / zoomRadius, pixelSize / zoomRadius);
+        }
+      }
+
+      // Restore the context to remove the clipping path
+      ctx.restore();
+    }
+
+    function zoomInCirclePixels(centerX, centerY) {
+      const zoomRadius = 50; // Radius of the circular zoom area
+      const zoomFactor = 4; // Zoom level
+
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Draw the original image
+      ctx.drawImage(img, 0, 0);
+      // Get the image data from the zoomed area
+      const imageData = ctx.getImageData(centerX - zoomRadius, centerY - zoomRadius, 2 * zoomRadius, 2 * zoomRadius);
+      const data = imageData.data;
+
+      // Save the current context state
+      ctx.save();
+
+      // Create a circular clipping path
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, zoomRadius, 0, 2 * Math.PI);
+      ctx.clip();
+
+      // Draw each pixel as a zoomed-in circle in the zoomed area
+      for (let y = 0; y < 2 * zoomRadius; y++) {
+        for (let x = 0; x < 2 * zoomRadius; x++) {
+          const index = (y * 2 * zoomRadius + x) * 4;
+          const red = data[index];
+          const green = data[index + 1];
+          const blue = data[index + 2];
+          const alpha = data[index + 3] / 255;
+
+          // Set the fill style to the pixel's color
+          ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+
+          // Calculate the position and size for the zoomed pixel
+          const pixelX = centerX + (x - zoomRadius) * zoomFactor;
+          const pixelY = centerY + (y - zoomRadius) * zoomFactor;
+
+          // Draw the circle for the zoomed pixel
+          ctx.beginPath();
+          ctx.arc(pixelX, pixelY, zoomFactor / 2, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      }
+
+      // Restore the context to remove the clipping path
+      ctx.restore();
+    }
+
+    function zoomInCirclePixelsSquare(centerX, centerY) {
+      const zoomRadius = 50; // Radius of the circular zoom area
+      const zoomFactor = 4; // Zoom level
+      const pixelSize = 8; // Size of each square pixel in the zoomed display
+
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw the original image
+      ctx.drawImage(img, 0, 0);
+
+      // Get the image data from the zoomed area
+      const imageData = ctx.getImageData(centerX - zoomRadius, centerY - zoomRadius, 2 * zoomRadius, 2 * zoomRadius);
+      const data = imageData.data;
+
+      // Save the current context state
+      ctx.save();
+
+      // Create a circular clipping path
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, zoomRadius, 0, 2 * Math.PI);
+      ctx.clip();
+
+      // Draw each pixel as a zoomed-in square in the zoomed area
+      for (let y = 0; y < 2 * zoomRadius; y++) {
+        for (let x = 0; x < 2 * zoomRadius; x++) {
+          const index = (y * 2 * zoomRadius + x) * 4;
+          const red = data[index];
+          const green = data[index + 1];
+          const blue = data[index + 2];
+          const alpha = data[index + 3] / 255;
+
+          // Set the fill style to the pixel's color
+          ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+
+          // Calculate the position for the zoomed pixel
+          const pixelX = centerX + (x - zoomRadius) * pixelSize;
+          const pixelY = centerY + (y - zoomRadius) * pixelSize;
+
+          // Draw the rectangle for the zoomed pixel
+          ctx.fillRect(pixelX, pixelY, pixelSize, pixelSize);
+        }
+      }
+
+      // Restore the context to remove the clipping path
+      ctx.restore();
+    }
+  </script>
+</body>
+
+</html>

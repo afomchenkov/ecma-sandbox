@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Pixel Manipulation</title>
+  <style>
+    #myCanvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="myCanvas"></canvas>
+  <script>
+
+    /**
+     * Performance Considerations
+     *
+     * - Large Images: Processing large images can be slow. Optimize by processing smaller regions
+     * if possible or use Web Workers for heavy computations to keep the main thread responsive.
+     *
+     * - Memory Usage: Large images consume more memory. Ensure your application manages memory
+     * efficiently, especially if dealing with multiple images or high-resolution data.
+     *
+     * - OffscreenCanvas: For complex processing, consider using OffscreenCanvas to offload
+     * work from the main thread.
+     *
+     * - Image Smoothing: If you are scaling images, you might want to control the image
+     * smoothing with ctx.imageSmoothingEnabled.
+     *
+     * - Advanced Manipulations: For more complex image processing tasks, consider using
+     * libraries like glfx.js or WebGL for hardware-accelerated image processing.
+     */
+
+
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.src = 'https://images.pexels.com/photos/12043242/pexels-photo-12043242.jpeg';
+
+    img.onload = function () {
+      // Resize the canvas to the image dimensions
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // Draw the image onto the canvas
+      ctx.drawImage(img, 0, 0);
+
+      // Access pixel data
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      // Loop through each pixel
+      for (let i = 0; i < data.length; i += 4) {
+        // Data is in RGBA format
+        const red = data[i];
+        const green = data[i + 1];
+        const blue = data[i + 2];
+        const alpha = data[i + 3];
+
+        // Apply some manipulation (e.g., invert colors)
+        data[i] = 255 - red;     // Red
+        data[i + 1] = 255 - green; // Green
+        data[i + 2] = 255 - blue;  // Blue
+        // Alpha (data[i + 3]) remains unchanged
+      }
+
+      // Put the modified data back onto the canvas
+      ctx.putImageData(imageData, 0, 0);
+    };
+
+    img.onerror = function () {
+      console.error('Failed to load the image.');
+    };
+  </script>
+</body>
+
+</html>

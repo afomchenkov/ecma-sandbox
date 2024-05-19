@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Efficient Image Rendering</title>
+  <style>
+    #myCanvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id='myCanvas'></canvas>
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    // img.crossOrigin = 'anonymous';
+    // img.setAttribute('crossOrigin', '');
+    img.src = './10270x3836-rostock.jpg';
+
+    img.onload = function () {
+      // Optionally scale the canvas to the image size
+      const scale = 0.5; // Scale down by 50% for example
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+
+      // Draw the scaled image
+      ctx.drawImage(img, 0, 0, img.width * scale, img.height * scale);
+
+      console.log(ctx.getImageData(0, 0, img.width, img.height));
+    };
+
+    img.onerror = function () {
+      console.error('Failed to load the image.');
+    };
+
+    // Example function to use OffscreenCanvas
+    function processImageOffscreen(img) {
+      if ('OffscreenCanvas' in window) {
+        const offscreenCanvas = new OffscreenCanvas(img.width, img.height);
+        const offscreenCtx = offscreenCanvas.getContext('2d');
+        offscreenCtx.drawImage(img, 0, 0);
+
+        // Perform any heavy processing on the offscreen canvas here
+
+        // Transfer result back to main canvas
+        ctx.drawImage(offscreenCanvas.transferToImageBitmap(), 0, 0, img.width * scale, img.height * scale);
+      }
+    }
+
+    function getImagePixels({ width, height }) {
+      const imgData = ctx.getImageData(0, 0, width, height);
+      const data = imgData.data;
+
+      // enumerate all pixels
+      // each pixel's r,g,b,a datum are stored in separate sequential array elements
+
+      // for(let i = 0; i < data.length; i += 4) {
+      //   const red = data[i];
+      //   const green = data[i + 1];
+      //   const blue = data[i + 2];
+      //   const alpha = data[i + 3];
+      // }
+
+      console.log(data);
+    }
+
+    function startMdnImageDownload() {
+      let imageURL =
+        'https://cdn.glitch.com/4c9ebeb9-8b9a-4adc-ad0a-238d9ae00bb5%2Fmdn_logo-only_color.svg?1535749917189';
+      let imageDescription = 'The Mozilla logo';
+
+      downloadedImg = new Image();
+      downloadedImg.crossOrigin = 'anonymous';
+      downloadedImg.addEventListener('load', imageReceived, false);
+      downloadedImg.alt = imageDescription;
+      downloadedImg.src = imageURL;
+    }
+
+    function saveImageToStarage() {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+
+      canvas.width = downloadedImg.width;
+      canvas.height = downloadedImg.height;
+      canvas.innerText = downloadedImg.alt;
+
+      context.drawImage(downloadedImg, 0, 0);
+      imageBox.appendChild(canvas);
+
+      try {
+        localStorage.setItem('saved-image-example', canvas.toDataURL('image/png'));
+      } catch (err) {
+        console.error(`Error: ${err}`);
+      }
+    }
+  </script>
+</body>
+
+</html>
