@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Canvas Zoom Circle</title>
+  <style>
+    #main-canvas, #gl-canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="main-canvas" width="500" height="500"></canvas>
+  <canvas id="gl-canvas" width="500" height="500"></canvas>
+  <script>
+    // HTML Canvas 2D Context
+    // The HTML Canvas 2D context (canvas.getContext('2d')) is a high-level API for drawing shapes, text,
+    // images, and other graphics. It is easy to use and suitable for simple or moderately complex 2D graphics.
+    const canvas2DContext = document.getElementById('main-canvas');
+    const ctx = canvas2DContext.getContext('2d');
+
+    // Draw a rectangle
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(50, 50, 200, 100);
+
+    // Draw some text
+    ctx.fillStyle = 'white';
+    ctx.font = '30px Arial';
+    ctx.fillText('Hello Canvas', 60, 120);
+
+    // WebGL Context
+    // WebGL (Web Graphics Library) is a low-level API for rendering 3D graphics. It provides a much more powerful
+    // and flexible interface but requires a deeper understanding of computer graphics and more code to accomplish
+    // similar tasks. WebGL is built on top of OpenGL ES, which is widely used in mobile devices.
+    //
+    // WebGL allows for hardware-accelerated rendering and is capable of rendering complex 3D scenes with high performance.
+    const canvasWebglContext = document.getElementById('gl-canvas');
+    const gl = canvasWebglContext.getContext('webgl');
+
+    if (!gl) {
+      console.error("WebGL not supported");
+    }
+
+    // Define the vertex shader
+    const vertexShaderSource = `
+        attribute vec2 a_position;
+        void main() {
+            gl_Position = vec4(a_position, 0, 1);
+        }
+    `;
+
+    // Define the fragment shader
+    const fragmentShaderSource = `
+        precision mediump float;
+        uniform vec4 u_color;
+        void main() {
+            gl_FragColor = u_color;
+        }
+    `;
+
+    // Compile the vertex shader
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertexShader, vertexShaderSource);
+    gl.compileShader(vertexShader);
+
+    // Compile the fragment shader
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragmentShader, fragmentShaderSource);
+    gl.compileShader(fragmentShader);
+
+    // Link the shaders into a program
+    const program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+
+    // Define a rectangle
+    const vertices = new Float32Array([
+      -0.5, -0.5,
+      0.5, -0.5,
+      -0.5, 0.5,
+      0.5, 0.5
+    ]);
+
+    // Create a buffer and put the vertices in it
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    // Use the program
+    gl.useProgram(program);
+
+    // Bind the buffer
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
+    // Get the position attribute location and enable it
+    const positionLocation = gl.getAttribLocation(program, 'a_position');
+    gl.enableVertexAttribArray(positionLocation);
+
+    // Tell the attribute how to get data out of the buffer
+    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+    // Set the color uniform
+    const colorLocation = gl.getUniformLocation(program, 'u_color');
+    gl.uniform4f(colorLocation, 0, 0, 1, 1);
+
+    // Draw the rectangle
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  </script>
+</body>
+
+</html>
