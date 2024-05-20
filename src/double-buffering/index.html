@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Optimized Moving Object on Canvas</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    canvas {
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="myCanvas" width="800" height="600"></canvas>
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Create an off-screen canvas for the background image
+    const offscreenCanvas = document.createElement('canvas');
+    const offscreenCtx = offscreenCanvas.getContext('2d');
+
+    const image = new Image();
+    image.src = 'https://via.placeholder.com/800x600'; // Replace with your image URL
+
+    let imageLoaded = false;
+
+    image.onload = () => {
+      offscreenCanvas.width = canvas.width;
+      offscreenCanvas.height = canvas.height;
+
+      // Draw the static image onto the off-screen canvas
+      offscreenCtx.drawImage(image, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+      imageLoaded = true;
+    };
+
+    let x = 100, y = 100; // Initial position of the moving object
+    const radius = 20; // Radius of the moving object
+    const speed = 2; // Movement speed
+
+    function drawMovingObject() {
+      if (!imageLoaded) return;
+
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw the off-screen canvas (background image) onto the main canvas
+      ctx.drawImage(offscreenCanvas, 0, 0);
+
+      // Draw the moving object
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'red';
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function updatePosition() {
+      x += speed;
+      if (x - radius < 0 || x + radius > canvas.width) {
+        x = radius;
+      }
+      drawMovingObject();
+    }
+
+    function animate() {
+      updatePosition();
+      requestAnimationFrame(animate);
+    }
+
+    // Start the animation loop
+    image.onload = () => {
+      offscreenCanvas.width = canvas.width;
+      offscreenCanvas.height = canvas.height;
+      offscreenCtx.drawImage(image, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+      imageLoaded = true;
+      animate();
+    };
+  </script>
+</body>
+
+</html>

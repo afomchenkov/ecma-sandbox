@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Optimized Moving Object with OffscreenCanvas</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    canvas {
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="mainCanvas" width="800" height="600"></canvas>
+  <script>
+    const mainCanvas = document.getElementById('mainCanvas');
+    const mainCtx = mainCanvas.getContext('2d');
+
+    // Create an offscreen canvas for the static background
+    const offscreenCanvas = new OffscreenCanvas(mainCanvas.width, mainCanvas.height);
+    const offscreenCtx = offscreenCanvas.getContext('2d');
+
+    const image = new Image();
+    image.crossOrigin = 'Anonymous';
+    image.src = 'https://images.pexels.com/photos/12043242/pexels-photo-12043242.jpeg';
+
+    let imageLoaded = false;
+
+    image.onload = () => {
+      // Draw the static image onto the offscreen canvas
+      offscreenCtx.drawImage(image, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+      imageLoaded = true;
+      requestAnimationFrame(animate);
+    };
+
+    let x = 100, y = 400; // Initial position of the moving object
+    const radius = 60; // Radius of the moving object, the circular zoom area
+    const speed = 1; // Movement speed
+    const pixelSize = 14; // Size of each square pixel in the zoomed display
+
+    function drawMovingObject() {
+      if (!imageLoaded) return;
+
+      // Clear the main canvas
+      mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+      // Draw the offscreen canvas (background image) onto the main canvas
+      mainCtx.drawImage(offscreenCanvas, 0, 0);
+      // Draw the moving object
+      mainCtx.beginPath();
+      mainCtx.arc(x, y, radius, 0, Math.PI * 2);
+      mainCtx.fillStyle = 'red';
+      mainCtx.fill();
+      mainCtx.closePath();
+    }
+
+    function drawZoom() {
+      if (!imageLoaded) return;
+      
+      const centerX = x;
+      const centerY = y;
+
+      // Clear the main canvas
+      mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+      // Draw the offscreen canvas (background image) onto the main canvas
+      mainCtx.drawImage(offscreenCanvas, 0, 0);
+
+      // Get the image data from the zoomed area
+      const imageData = mainCtx.getImageData(centerX - radius, centerY - radius, 2 * radius, 2 * radius);
+      const data = imageData.data;
+
+      // Save the current context state
+      mainCtx.save();
+      // Create a circular clipping path
+      mainCtx.beginPath();
+      mainCtx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      mainCtx.clip();
+
+      // Draw each pixel as a zoomed-in square in the zoomed area
+      for (let y = 0; y < 2 * radius; y++) {
+        for (let x = 0; x < 2 * radius; x++) {
+          const index = (y * 2 * radius + x) * 4;
+          const red = data[index];
+          const green = data[index + 1];
+          const blue = data[index + 2];
+          const alpha = data[index + 3] / 255;
+
+          // Set the fill style to the pixel's color
+          mainCtx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+
+          // Calculate the position for the zoomed pixel
+          const pixelX = centerX + (x - radius) * pixelSize;
+          const pixelY = centerY + (y - radius) * pixelSize;
+
+          // Draw the rectangle for the zoomed pixel
+          mainCtx.fillRect(pixelX, pixelY, pixelSize, pixelSize);
+        }
+      }
+
+      // Restore the context to remove the clipping path
+      mainCtx.restore();
+    }
+
+    function updatePosition() {
+      x += speed;
+      if (x - radius < 0 || x + radius > mainCanvas.width) {
+        x = radius;
+      }
+      // drawMovingObject();
+      drawZoom();
+    }
+
+    function animate() {
+      updatePosition();
+      requestAnimationFrame(animate);
+    }
+  </script>
+</body>
+
+</html>
