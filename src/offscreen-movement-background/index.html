@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Canvas with Web Worker and OffscreenCanvas</title>
+  <style>
+    #myCanvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="myCanvas" width="1200" height="800"></canvas>
+  <script>
+    const mainCanvas = document.getElementById('myCanvas');
+    const ctx = mainCanvas.getContext('2d');
+
+    const worker = new Worker('worker.js');
+
+    // const offscreenCanvas = mainCanvas.transferControlToOffscreen();
+    const offscreenCanvas = new OffscreenCanvas(mainCanvas.width, mainCanvas.height);
+    worker.postMessage({ canvas: offscreenCanvas }, [offscreenCanvas]);
+
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.src = 'https://images.pexels.com/photos/12043242/pexels-photo-12043242.jpeg';
+
+    img.onload = () => {
+      worker.postMessage({ type: 'renderBackground', img: img.src });
+      // ctx.drawImage(img, 0, 0, img.width, img.height);
+    };
+
+    mainCanvas.addEventListener('mousemove', (event) => {
+      const rect = mainCanvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      worker.postMessage({ type: 'mousemove', x, y });
+    });
+
+    worker.onmessage = (event) => {
+      const { type, frame } = event.data;
+
+      if (type === 'renderFrame') {
+        ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+        ctx.drawImage(frame, 0, 0);
+      }
+    };
+  </script>
+</body>
+
+</html>

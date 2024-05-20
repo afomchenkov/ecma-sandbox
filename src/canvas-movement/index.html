@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Canvas with Web Worker and OffscreenCanvas</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    canvas {
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="mainCanvas" width="1400" height="800"></canvas>
+  <script>
+    const canvas = document.getElementById('mainCanvas');
+    // IMPORTANT: if ctx created, throws native exception
+    // Failed to execute 'transferControlToOffscreen' on 'HTMLCanvasElement': Cannot transfer control from a canvas that has a rendering context.
+    // const ctx = canvas.getContext('2d');
+
+    // Create the Web Worker
+    const worker = new Worker('worker.js');
+    // Transfer the canvas control to OffscreenCanvas
+    const offscreen = canvas.transferControlToOffscreen();
+    // const offscreen = new OffscreenCanvas(canvas.width, canvas.height);
+    worker.postMessage({ canvas: offscreen }, [offscreen]);
+
+    // Listen for mouse movements
+    canvas.addEventListener('mousemove', (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      worker.postMessage({ type: 'mousemove', x, y });
+    });
+
+    // Optionally handle other messages from the worker
+    worker.onmessage = (event) => {
+      // Process messages from the worker if necessary
+      console.log('Message from worker: ', event);
+    };
+  </script>
+</body>
+
+</html>

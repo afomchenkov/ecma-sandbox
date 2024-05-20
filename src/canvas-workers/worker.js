@@ -1,5 +1,5 @@
 let canvas, ctx, image, imageLoaded = false;
-let x = 100, y = 100, radius = 20, speed = 2;
+let x = 100, y = 300, radius = 20, speed = 2;
 
 self.onmessage = async (event) => {
   if (event.data.canvas) {

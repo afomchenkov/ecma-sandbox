@@ -25,7 +25,7 @@
   <canvas id="mainCanvas" width="800" height="600"></canvas>
   <script>
     const mainCanvas = document.getElementById('mainCanvas');
-    const mainCtx = mainCanvas.getContext('2d');
+    // const mainCtx = mainCanvas.getContext('2d');
 
     const image = new Image();
     image.crossOrigin = 'Anonymous';
@@ -40,8 +40,8 @@
       // 2. Web Worker: Handle the rendering of the moving object and communicate with the main thread.
 
       // Send OffscreenCanvas to the worker
-      // const offscreenCanvas = mainCanvas.transferControlToOffscreen();
-      const offscreenCanvas = new OffscreenCanvas(mainCanvas.width, mainCanvas.height);
+      const offscreenCanvas = mainCanvas.transferControlToOffscreen();
+      // const offscreenCanvas = new OffscreenCanvas(mainCanvas.width, mainCanvas.height);
       const worker = new Worker('worker.js');
       worker.postMessage({ canvas: offscreenCanvas, imageSrc: image.src }, [offscreenCanvas]);
 
