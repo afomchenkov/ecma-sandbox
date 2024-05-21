@@ -15,12 +15,12 @@
   <canvas id="myCanvas" width="1200" height="800"></canvas>
   <script>
     const mainCanvas = document.getElementById('myCanvas');
-    const ctx = mainCanvas.getContext('2d');
+    // const ctx = mainCanvas.getContext('2d');
 
     const worker = new Worker('worker.js');
 
-    // const offscreenCanvas = mainCanvas.transferControlToOffscreen();
-    const offscreenCanvas = new OffscreenCanvas(mainCanvas.width, mainCanvas.height);
+    // const offscreenCanvas = new OffscreenCanvas(mainCanvas.width, mainCanvas.height);
+    const offscreenCanvas = mainCanvas.transferControlToOffscreen();
     worker.postMessage({ canvas: offscreenCanvas }, [offscreenCanvas]);
 
     const img = new Image();
@@ -40,14 +40,14 @@
       worker.postMessage({ type: 'mousemove', x, y });
     });
 
-    worker.onmessage = (event) => {
-      const { type, frame } = event.data;
-
-      if (type === 'renderFrame') {
-        ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-        ctx.drawImage(frame, 0, 0);
-      }
-    };
+    // offscreen canvas cannot be retured from worker
+    // worker.onmessage = (event) => {
+    //   const { type, frame } = event.data;
+    //   if (type === 'renderFrame') {
+    //     ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+    //     ctx.drawImage(frame, 0, 0);
+    //   }
+    // };
   </script>
 </body>
 

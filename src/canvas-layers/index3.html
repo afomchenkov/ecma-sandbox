@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Canvas Lens Effect</title>
+  <style>
+    #backgroundCanvas,
+    #overlayCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    #overlayCanvas {
+      pointer-events: none;
+      /* Make overlay canvas transparent to mouse events */
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="backgroundCanvas" width="800" height="600"></canvas>
+  <canvas id="overlayCanvas" width="800" height="600"></canvas>
+  <script>
+    const backgroundCanvas = document.getElementById('backgroundCanvas');
+    const overlayCanvas = document.getElementById('overlayCanvas');
+    const bgCtx = backgroundCanvas.getContext('2d');
+    const overlayCtx = overlayCanvas.getContext('2d');
+
+    const backgroundImage = new Image();
+    const overlayImage = new Image();
+    const lensRadius = 50;
+
+    backgroundImage.crossOrigin = 'Anonymous';
+    backgroundImage.src = 'https://images.pexels.com/photos/12043242/pexels-photo-12043242.jpeg';
+    overlayImage.crossOrigin = 'Anonymous';
+    overlayImage.src = 'https://cdn.pixabay.com/photo/2015/09/13/02/07/footprint-937632_1280.jpg';
+
+    backgroundImage.onload = () => {
+      bgCtx.drawImage(backgroundImage, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
+    };
+
+    overlayImage.onload = () => {
+      // Pre-draw the overlay image to optimize performance
+      overlayCtx.drawImage(overlayImage, 0, 0, 100, 100);
+      overlayCtx.globalCompositeOperation = 'destination-in';
+    };
+
+    overlayCanvas.addEventListener('mousemove', (event) => {
+      const rect = overlayCanvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      renderOverlay(x, y);
+    });
+
+    overlayCanvas.addEventListener('mouseleave', () => {
+      clearOverlay();
+    });
+
+    function renderOverlay(mouseX, mouseY) {
+      clearOverlay();
+      overlayCtx.save();
+      overlayCtx.beginPath();
+      overlayCtx.arc(mouseX, mouseY, lensRadius, 0, 2 * Math.PI);
+      overlayCtx.clip();
+
+      // Calculate the cropping area of the overlay image
+      const cropX = mouseX - lensRadius;
+      const cropY = mouseY - lensRadius;
+      const cropWidth = lensRadius * 2;
+      const cropHeight = lensRadius * 2;
+
+      overlayCtx.drawImage(
+        overlayImage,
+        cropX, cropY, cropWidth, cropHeight,  // Source coordinates and dimensions
+        mouseX - lensRadius, mouseY - lensRadius, cropWidth, cropHeight   // Destination coordinates and dimensions
+      );
+
+      overlayCtx.restore();
+    }
+
+    function clearOverlay() {
+      overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+    }
+  </script>
+</body>
+
+</html>

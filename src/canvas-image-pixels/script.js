@@ -1,13 +1,19 @@
 const mainCanvas = document.getElementById('mainCanvas');
 const mainCtx = mainCanvas.getContext('2d');
+const scaleFactor = 1.3;
 
 // Image to be loaded and pixelated
 const image = new Image();
 image.src = 'https://images.pexels.com/photos/12043242/pexels-photo-12043242.jpeg';
 image.crossOrigin = 'Anonymous';
 image.onload = () => {
+  mainCanvas.width = image.width * scaleFactor;
+  mainCanvas.height = image.height * scaleFactor;
+  mainCtx.scale(scaleFactor, scaleFactor);
+
   mainCtx.drawImage(image, 0, 0, mainCanvas.width, mainCanvas.height);
-  pixelateImage(4); // Change the pixel size as needed
+  
+  pixelateImage(6); // Change the pixel size as needed
 };
 
 function pixelateImage(pixelSize) {
@@ -67,7 +73,7 @@ function pixelateImage(pixelSize) {
       for (let yy = 0; yy < pixelSize; yy++) {
         for (let xx = 0; xx < pixelSize; xx++) {
           const px = (x + xx + (y + yy) * width) * 4;
-          
+
           if (px < data.length) {
             data[px] = r;
             data[px + 1] = g;
