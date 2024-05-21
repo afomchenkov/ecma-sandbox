@@ -122,6 +122,13 @@ const zoomInCirclePixels = (
 
   // Restore the context to remove the clipping path
   context.restore();
+
+  // Draw lens border
+  context.beginPath();
+  context.arc(centerX, centerY, zoomRadius, 0, Math.PI * 2);
+  context.strokeStyle = 'white';
+  context.lineWidth = 3;
+  context.stroke();
 }
 
 // Convert SVG string to an Image
