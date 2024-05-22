@@ -10,16 +10,11 @@ self.onmessage = async (event) => {
     ctx = offscreenCanvas.getContext('2d');
     // Load the background image
     backgroundImg = await loadImage('https://images.pexels.com/photos/12043242/pexels-photo-12043242.jpeg');
-
-    // render();
     drawZoom();
   }
 
   if (data.type === 'mousemove') {
     objectPosition = { x: data.x, y: data.y };
-
-    // performHeavyCalculations();
-    // render();
     // self.postMessage({ type: 'renderFrame', frame: offscreenCanvas });
     drawZoom();
   }
@@ -36,31 +31,11 @@ async function loadImage(src) {
   return image;
 }
 
-
-function performHeavyCalculations() {
-  // Perform heavy calculations here
-  // This example just simulates heavy computation with a delay
-  for (let i = 0; i < 1e6; i++) { }
-}
-
-function render() {
-  if (!ctx || !backgroundImg) return;
-
-  // Clear the canvas
-  ctx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
-  // Draw the background image
-  ctx.drawImage(backgroundImg, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
-  // Draw the moving object
-  ctx.fillStyle = 'red';
-  ctx.beginPath();
-  ctx.arc(objectPosition.x, objectPosition.y, 20, 0, 2 * Math.PI);
-  ctx.fill();
-}
-
-const radius = 60; // Radius of the moving object, the circular zoom area
-const pixelSize = 14; // Size of each square pixel in the zoomed display
 function drawZoom() {
   if (!ctx || !backgroundImg) return;
+
+  const radius = 70; // Radius of the moving object, the circular zoom area
+  const pixelSize = 14; // Size of each square pixel in the zoomed display
 
   const centerX = objectPosition.x;
   const centerY = objectPosition.y;

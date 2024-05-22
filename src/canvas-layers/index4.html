@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Canvas Circular Image Data</title>
+  <style>
+    #myCanvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="myCanvas" width="800" height="600"></canvas>
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Load the background image
+    const img = new Image();
+    img.src = 'path/to/your/large-image.jpg'; // Replace with the path to your image
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0);
+    };
+
+    canvas.addEventListener('mousemove', (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const radius = 50;
+      const circleData = getCircleImageData(ctx, x, y, radius);
+      renderCircleImageData(ctx, circleData, x, y, radius);
+    });
+
+    function getCircleImageData(ctx, centerX, centerY, radius) {
+      // Get the bounding box for the circle
+      const startX = centerX - radius;
+      const startY = centerY - radius;
+      const diameter = radius * 2;
+      const imageData = ctx.getImageData(startX, startY, diameter, diameter);
+      const { data, width, height } = imageData;
+
+      // Create a new ImageData object for the circular area
+      const circleImageData = ctx.createImageData(diameter, diameter);
+      const circleData = circleImageData.data;
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const dx = x - radius;
+          const dy = y - radius;
+          if (dx * dx + dy * dy <= radius * radius) {
+            const srcIndex = (y * width + x) * 4;
+            const destIndex = (y * width + x) * 4;
+            circleData[destIndex] = data[srcIndex];
+            circleData[destIndex + 1] = data[srcIndex + 1];
+            circleData[destIndex + 2] = data[srcIndex + 2];
+            circleData[destIndex + 3] = data[srcIndex + 3];
+          } else {
+            const destIndex = (y * width + x) * 4;
+            circleData[destIndex + 3] = 0; // Set alpha to 0 for pixels outside the circle
+          }
+        }
+      }
+
+      return circleImageData;
+    }
+
+    function renderCircleImageData(ctx, imageData, x, y, radius) {
+      // Clear previous rendering
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Draw the background image again
+      ctx.drawImage(img, 0, 0);
+      // Draw the circular image data at the desired position
+      ctx.putImageData(imageData, x - radius, y - radius);
+    }
+  </script>
+</body>
+
+</html>
