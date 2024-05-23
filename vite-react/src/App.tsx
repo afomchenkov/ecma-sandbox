@@ -80,6 +80,7 @@ const zoomInCirclePixels = (
   canvas: HTMLCanvasElement,
   context: CanvasRenderingContext2D,
   image: HTMLImageElement,
+  event: MouseEvent,
 ) => {
   const zoomRadius = 70; // Radius of the circular zoom area
   const pixelSize = 11; // Size of each square pixel in the zoomed display
@@ -127,7 +128,7 @@ const zoomInCirclePixels = (
   context.beginPath();
   context.arc(centerX, centerY, zoomRadius, 0, Math.PI * 2);
   context.strokeStyle = 'white';
-  context.lineWidth = 3;
+  context.lineWidth = 5;
   context.stroke();
 }
 
@@ -203,12 +204,12 @@ const App = () => {
             drawImage(image, canvas, context);
 
             // click - mousemove
-            canvas.addEventListener('mousemove', async (event) => {
+            canvas.addEventListener('mousemove', async (event: MouseEvent) => {
               const rect = canvas.getBoundingClientRect();
               const x = event.clientX - rect.left;
               const y = event.clientY - rect.top;
       
-              zoomInCirclePixels(x, y, canvas, context, image);
+              zoomInCirclePixels(x, y, canvas, context, image, event);
 
               const color = getPixelData(event, context);
               const { r, g, b } = color;

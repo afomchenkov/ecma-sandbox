@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Optimized Canvas with Web Worker</title>
+  <style>
+    #myCanvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="myCanvas" width="800" height="600"></canvas>
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const worker = new Worker('worker.js');
+
+    // Transfer the canvas control to OffscreenCanvas
+    const offscreen = canvas.transferControlToOffscreen();
+    worker.postMessage({ canvas: offscreen }, [offscreen]);
+
+    // Listen for mouse movements
+    canvas.addEventListener('mousemove', (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      worker.postMessage({ type: 'mousemove', x, y });
+    });
+  </script>
+</body>
+
+</html>
