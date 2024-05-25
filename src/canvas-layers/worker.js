@@ -1,14 +1,8 @@
 let offscreenCanvas, ctx, backgroundImg;
 let mousePosition = { x: 0, y: 0 };
-const lensRadius = 70;
-const zoomFactor = 3;
-let pixelatedImage, newImgDataBitmap, selectedColorImage = null;
-
-const SelectedColorSvg = `
-  <svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M80 148C117.555 148 148 117.555 148 80C148 42.4446 117.555 12 80 12C42.4446 12 12 42.4446 12 80C12 117.555 42.4446 148 80 148ZM80 160C124.183 160 160 124.183 160 80C160 35.8172 124.183 0 80 0C35.8172 0 0 35.8172 0 80C0 124.183 35.8172 160 80 160Z" fill="#D9D9D9"/>
-  </svg>
-`;
+const lensRadius = 75;
+const zoomFactor = 2;
+let pixelatedImage, newImgDataBitmap, selectedColorImage, circleSvgBitmap = null;
 
 function getPixelData(context, x, y) {
   // const x = event.offsetX;
@@ -27,44 +21,59 @@ function getPixelData(context, x, y) {
   return { r, g, b, a, };
 }
 
-// Convert SVG string to an Image
-async function svgStringToImage(svgString, color) {
-  let coloredSvgString = svgString;
-  if (color) {
-    coloredSvgString = svgString.replace('#D9D9D9', color);
-  }
-  
-  const svgBlob = new Blob([coloredSvgString], { type: 'image/svg+xml;charset=utf-8' });
+async function loadSvg(svgString) {
+  // Create a Blob from the SVG string
+  const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(svgBlob);
-  const img = new Image();
+  // Use fetch to load the SVG as a response
+  const response = await fetch(url);
+  const svgText = await response.text();
+  URL.revokeObjectURL(url); // Revoke the URL as soon as possible
 
-  const imgLoaded = new Promise((resolve, reject) => {
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve(img);
-    };
-    img.onerror = reject;
-  });
-  
-  img.src = url;
-  await imgLoaded;
 
-  return img;
+  // Create an image bitmap from the SVG text
+  const svgBlobForBitmap = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+  const bitmap = await createImageBitmap(svgBlobForBitmap);
+
+  // return bitmap;
 }
+
+// Convert SVG string to an Image
+// async function svgStringToImage(svgString, color) {
+//   let coloredSvgString = svgString;
+//   if (color) {
+//     coloredSvgString = svgString.replace('#D9D9D9', color);
+//   }
+  
+//   const svgBlob = new Blob([coloredSvgString], { type: 'image/svg+xml;charset=utf-8' });
+//   const url = URL.createObjectURL(svgBlob);
+//   const img = new Image();
+
+//   const imgLoaded = new Promise((resolve, reject) => {
+//     img.onload = () => {
+//       URL.revokeObjectURL(url);
+//       resolve(img);
+//     };
+//     img.onerror = reject;
+//   });
+  
+//   img.src = url;
+//   await imgLoaded;
+
+//   return img;
+// }
 
 function componentToHex(component) {
   const hex = component.toString(16);
   return hex.length === 1 ? '0' : '' + hex;
 }
 
-function rgbToHex(r, g, b) {
-  // Convert the RGB components to hex
+function rgbToHex(colors) {
+  const { r, g, b } = colors;
   const rHex = componentToHex(r);
   const gHex = componentToHex(g);
   const bHex = componentToHex(b);
-
-  // Combine and return the full hex color code
-  return `#${rHex}${gHex}${bHex}`;
+  return `#${rHex}${gHex}${bHex}`.padEnd(7, 0);
 }
 
 
@@ -86,8 +95,8 @@ self.onmessage = async (event) => {
 
     // preload and pixelate the image for zoom
     pixelatedImage = pixelateImage(4, ctx, width, height);
-    const newImgData = new ImageData(pixelatedImage, width, height);
-    newImgDataBitmap = await createImageBitmap(newImgData);
+    newImgDataBitmap = await createImageBitmap(new ImageData(pixelatedImage, width, height));
+    // circleSvgBitmap = await loadSvg(SelectedColorSvg);
 
     // selectedColorImage = await svgStringToImage(SelectedColorSvg);
   }
@@ -130,18 +139,25 @@ function drawZoomLens(ctx, x, y, radius, zoom) {
   const zoomCanvas = new OffscreenCanvas(diameter, diameter);
   const zoomCtx = zoomCanvas.getContext('2d');
 
-  // const color = getPixelData(zoomCtx, mousePosition.x, mousePosition.y);
-  // const { r, g, b } = color;
-  // const hexcolor = rgbToHex(r, g, b);
-  // console.log(hexcolor);
+  // Calculate the index of the pixel
+  const index = getPixelIndex(x, y, offscreenCanvas.width);
+
+  // Log the pixel data at the clicked position
+  const r = pixelatedImage[index];
+  const g = pixelatedImage[index + 1];
+  const b = pixelatedImage[index + 2];
+  const a = pixelatedImage[index + 3];
+
+  const hex = rgbToHex({ r, g, b });
+  console.log({ r, g, b, a, hex });
 
   // zoomCtx.drawImage(selectedColorImage, x - selectedColorImage.width / 2, y - selectedColorImage.height / 2);
 
   // Draw the zoomed portion of the image onto the offscreen canvas
   zoomCtx.drawImage(
     newImgDataBitmap,
-    startX - (radius / zoom),
-    startY - (radius / zoom),
+    x - (radius / zoom),
+    y - (radius / zoom),
     diameter / zoom,
     diameter / zoom,
     0,
@@ -150,6 +166,29 @@ function drawZoomLens(ctx, x, y, radius, zoom) {
     diameter
   );
 
+  const textX = radius - 30;
+  const textY = radius + 20;
+
+  drawRoundedRect(zoomCtx, textX - 5, textY - 15, 75, 20, 5);
+
+  zoomCtx.font = '16px Arial';
+  zoomCtx.fillStyle = hex;
+  zoomCtx.fillText(hex, textX, textY);
+
+  // // Draw lens border
+  // zoomCtx.beginPath();
+  // zoomCtx.arc(diameter / zoom, diameter / zoom, radius, 0, Math.PI * 2);
+  // zoomCtx.strokeStyle = hex;
+  // zoomCtx.lineWidth = 16;
+  // zoomCtx.stroke();
+
+  // // Draw outer lens border
+  // zoomCtx.beginPath();
+  // zoomCtx.arc(diameter / zoom, diameter / zoom, radius, 0, Math.PI * 2);
+  // zoomCtx.strokeStyle = 'white';
+  // zoomCtx.lineWidth = 1;
+  // zoomCtx.stroke();
+
   // Clip and draw the zoomed circle onto the main canvas
   ctx.save();
   ctx.beginPath();
@@ -157,13 +196,32 @@ function drawZoomLens(ctx, x, y, radius, zoom) {
   ctx.clip();
   ctx.drawImage(zoomCanvas, startX, startY);
   ctx.restore();
+
+  // Draw lens border
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = hex;
+  ctx.lineWidth = 10;
+  ctx.stroke();
+
+  // Draw outer lens border
+  // ctx.beginPath();
+  // ctx.arc(x, y, radius + 5, 0, Math.PI * 2);
+  // ctx.strokeStyle = 'grey';
+  // ctx.lineWidth = 1;
+  // ctx.stroke();
+
+  // // Draw inner lens border
+  // ctx.beginPath();
+  // ctx.arc(x, y, radius - 5, 0, Math.PI * 2);
+  // ctx.strokeStyle = 'white';
+  // ctx.lineWidth = 1;
+  // ctx.stroke();
 }
 
 function pixelateImage(pixelSize, ctx, width, height) {
-  // get image pixels data from (0, 0) to (width, height)
-  const imageData = ctx.getImageData(0, 0, width, height);
-  const data = imageData.data;
-  const newImageLayout = new Uint8ClampedArray(data.length);
+  const { data: pixels } = ctx.getImageData(0, 0, width, height);
+  const newImageLayout = new Uint8ClampedArray(pixels.length);
 
   for (let y = 0; y < height; y += pixelSize) {
     for (let x = 0; x < width; x += pixelSize) {
@@ -176,11 +234,11 @@ function pixelateImage(pixelSize, ctx, width, height) {
         for (let xx = 0; xx < pixelSize; xx++) {
           const px = (x + xx + (y + yy) * width) * 4;
 
-          if (px < data.length) {
-            red.push(data[px]);
-            green.push(data[px + 1]);
-            blue.push(data[px + 2]);
-            alpha.push(data[px + 3]);
+          if (px < pixels.length) {
+            red.push(pixels[px]);
+            green.push(pixels[px + 1]);
+            blue.push(pixels[px + 2]);
+            alpha.push(pixels[px + 3]);
           }
         }
       }
@@ -196,7 +254,7 @@ function pixelateImage(pixelSize, ctx, width, height) {
         for (let xx = 0; xx < pixelSize; xx++) {
           const px = (x + xx + (y + yy) * width) * 4;
 
-          if (px < data.length) {
+          if (px < pixels.length) {
             newImageLayout[px] = r;
             newImageLayout[px + 1] = g;
             newImageLayout[px + 2] = b;
@@ -210,7 +268,40 @@ function pixelateImage(pixelSize, ctx, width, height) {
   return newImageLayout;
 }
 
+function getPixelIndex(x, y, width) {
+  return (y * width + x) * 4;
+}
+
 function average(arr) {
   const sum = arr.reduce((a, b) => a + b, 0);
   return sum / arr.length;
+}
+
+function invertColor(r, g, b) {
+  // Invert each component
+  const invertedR = 255 - r;
+  const invertedG = 255 - g;
+  const invertedB = 255 - b;
+
+  return {
+    r: invertedR,
+    g: invertedG,
+    b: invertedB,
+  };
+}
+
+function drawRoundedRect(ctx, x, y, width, height, radius, color) {
+  ctx.fillStyle = color || 'grey';
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.arcTo(x + width, y, x + width, y + radius, radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.arcTo(x + width, y + height, x + width - radius, y + height, radius);
+  ctx.lineTo(x + radius, y + height);
+  ctx.arcTo(x, y + height, x, y + height - radius, radius);
+  ctx.lineTo(x, y + radius);
+  ctx.arcTo(x, y, x + radius, y, radius);
+  ctx.closePath();
+  ctx.fill();
 }
