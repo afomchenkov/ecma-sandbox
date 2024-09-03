@@ -2271,12 +2271,6 @@ function isPalindrome(s) {
   let right = s.length - 1;
 
   while (left < right) {
-    while (left < right) {
-      left++;
-    }
-    while (right > left) {
-      right--;
-    }
     if (s.at(left).toLowerCase() != s.at(right).toLowerCase()) {
       return false;
     }
