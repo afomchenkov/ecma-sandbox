@@ -176,35 +176,6 @@ function treeZigzagLevelOrder(root) {
   return res;
 }
 
-const generateParenBacktracking = (n) => {
-  const totalLength = 2 * n;
-  const result = [];
-
-  const backtrack = (curr, leftCount, rightCount) => {
-    if (curr.length == totalLength) {
-      result.push(curr.join(''));
-    }
-
-    // push left parenthesis
-    if (leftCount < n) {
-      curr.push('(');
-      backtrack(curr, leftCount + 1, rightCount);
-      curr.pop();
-    }
-
-    // push right parenthesis
-    if (leftCount > rightCount) {
-      curr.push(')');
-      backtrack(curr, leftCount, rightCount + 1);
-      curr.pop();
-    }
-  };
-
-  backtrack([], 0, 0);
-  return result;
-};
-// console.log('BT: ', generateParenBacktracking(3));
-
 function generateParenthesis(n) {
   const list = [];
   const maxLen = n * 2;
@@ -227,76 +198,6 @@ function generateParenthesis(n) {
   backtrack('', 0, 0);
   return list;
 }
-
-// TODO: recap
-// function findStringCombinationsNoOverlaps(s) {
-//   if (s.length == 0) {
-//     return combinations;
-//   }
-
-//   function _findCombinations(str, substring, combinations) {
-//     if (str.length == 0) {
-//       combinations.add([...substring]);
-//       return;
-//     }
-
-//     for (let i = 0; i < str.length; i++) {
-//       const sub = str.substring(0, i + 1);
-//       substring.push(sub);
-//       const next = str.substring(i + 1);
-//       _findCombinations(next, substring, combinations);
-//       substring.pop();
-//     }
-//   }
-
-//   const combinations = new Set();
-//   const substring = [];
-//   _findCombinations(s, substring, combinations);
-
-//   return [...combinations];
-// }
-
-// TODO: recap
-// const dijkstra = (edges, start_node, end_node) => {
-//   let g = new Map(); // <string, { weight, end }[]>
-
-//   for (const [start, end, weight] of edges) {
-//     if (g.has(start)) {
-//       g.get(start).push([weight, end]);
-//     } else {
-//       g.set(start, [[weight, end]]);
-//     }
-//   }
-
-//   const q = [[0, start_node, []]]; // min_heap[weight, node, [adjacent nodes]]
-//   const visited = new Set();
-
-//   while (q.length) {
-//     let [cost, v1, path] = q.pop(); // take next min weight path
-
-//     if (!visited.has(v1)) {
-//       visited.add(v1);
-
-//       path = [v1, path];
-//       if (v1 === end_node) {
-//         return [cost, path];
-//       }
-
-//       for (const [c, v2] of g.get(v1) || []) {
-//         if (!visited.has(v2)) {
-//           q.push([cost + c, v2, path]);
-//           q.sort((a, b) => {
-//             const [weightA] = a;
-//             const [weightB] = b;
-//             return weightA < weightB;
-//           });
-//         }
-//       }
-//     }
-//   }
-
-//   return [];
-// };
 
 function islandsCount(grid) {
   let counter = 0;
@@ -431,31 +332,6 @@ function maxDepthTopDown(root, depth) {
   maxDepthTopDown(root.right, depth + 1);
 };
 
-// TODO: recap
-// function getUniqueSubstr(str) {
-//   let n = str.length;
-//   let window = {};
-//   let start = 0;
-//   let end = 0;
-
-//   for (let left = 0, right = 0; right < n; ++right) {
-//     if (window[str[right]]) {
-//       while (str[left] != str[right]) {
-//         window[str[left++]] = false;
-//       }
-//       left++;
-//     } else {
-//       window[str[right]] = true;
-//       if (end - start < right - left) {
-//         start = left;
-//         end = right;
-//       }
-//     }
-//   }
-
-//   return str.substr(start, end - start + 1);
-// };
-
 function generateSubsets1(nums) {
   const result = [];
   nums.sort((a, b) => a - b);
@@ -539,3 +415,185 @@ function combinationSumWithoutDuplicates(num, target) {
   dfs(num, 0, [], 0, target);
   return res;
 }
+
+const generateParenBacktracking = (n) => {
+  const totalLength = 2 * n;
+  const result = [];
+
+  const backtrack = (curr, leftCount, rightCount) => {
+    if (curr.length == totalLength) {
+      result.push(curr.join(''));
+    }
+
+    // push left parenthesis
+    if (leftCount < n) {
+      curr.push('(');
+      backtrack(curr, leftCount + 1, rightCount);
+      curr.pop();
+    }
+
+    // push right parenthesis
+    if (leftCount > rightCount) {
+      curr.push(')');
+      backtrack(curr, leftCount, rightCount + 1);
+      curr.pop();
+    }
+  };
+
+  backtrack([], 0, 0);
+  return result;
+};
+// console.log('BT: ', generateParenBacktracking(3));
+
+const dijkstra = (edges, startNode, endNode) => {
+  let graph = new Map(); // <string, { weight, end }[]>
+
+  // build the graph of start/end edges
+  for (const [v1, v2, weight] of edges) {
+    if (graph.has(v1)) {
+      graph.get(v1).push({ weight, v2 });
+    } else {
+      graph.set(v1, [{ weight, v2 }]);
+    }
+  }
+
+  const minHeap = [[0, startNode, []]]; // [weight, node, [adjacent nodes]]
+  const visited = new Set();
+  while (minHeap.length) {
+    let [cost, v1, path] = minHeap.pop();
+
+    if (!visited.has(v1)) {
+      visited.add(v1);
+
+      path = [...path, v1];
+      // check if shortest reached
+      if (v1 == endNode) {
+        return [cost, path];
+      }
+
+      for (const nextNode of graph.get(v1) || []) {
+        const { v2, weight } = nextNode;
+
+        if (!visited.has(v2)) {
+          minHeap.push([cost + weight, v2, path]);
+          // relaxation, find min path so far
+          minHeap.sort((a, b) => a[0] < b[0]);
+          // we can also override Math.min(cost, cost + weight) to keep min path all the time
+        }
+      }
+    }
+  }
+
+  return [];
+}
+
+const edges = [
+  ['A', 'B', 7],
+  ['A', 'D', 5],
+  ['B', 'C', 8],
+  ['B', 'D', 9],
+  ['B', 'E', 7],
+  ['C', 'E', 5],
+  ['D', 'E', 7],
+  ['D', 'F', 6],
+  ['E', 'F', 8],
+  ['E', 'G', 9],
+  ['F', 'G', 11],
+];
+
+// path1 = A(7) -> B(8) -> C(5) -> E(9) -> G, total_weight = 29
+// path2 = A(7) -> B(9) -> D(7) -> E(9) -> G, total_weight = 32
+// path3 = A(7) -> B(7) -> E(9) -> G, total_weight = 23
+// path4 = A(5) -> D(7) -> E(9) -> G, total_weight = 22
+
+// console.log(JSON.stringify(dijkstra(edges, 'A', 'G')));
+
+function findStringCombinationsNoOverlaps(s) {
+  if (s.length == 0) {
+    return combinations;
+  }
+
+  function _findCombinations(str, substring, combinations) {
+    if (str.length == 0) {
+      combinations.add([...substring]);
+      return;
+    }
+
+    for (let i = 0; i < str.length; i++) {
+      const sub = str.substring(0, i + 1);
+
+      substring.push(sub);
+      _findCombinations(str.substring(i + 1), substring, combinations);
+      substring.pop();
+    }
+  }
+
+  const combinations = new Set();
+  const substring = [];
+  _findCombinations(s, substring, combinations);
+
+  return [...combinations];
+}
+// console.log(findStringCombinationsNoOverlaps("aads"));
+
+// TODO: recap
+// function getUniqueSubstr(str) {
+//   let n = str.length;
+//   let window = {};
+//   let start = 0;
+//   let end = 0;
+
+//   for (let left = 0, right = 0; right < n; ++right) {
+//     if (window[str[right]]) {
+//       while (str[left] != str[right]) {
+//         window[str[left++]] = false;
+//       }
+//       left++;
+//     } else {
+//       window[str[right]] = true;
+//       if (end - start < right - left) {
+//         start = left;
+//         end = right;
+//       }
+//     }
+//   }
+
+//   return str.substr(start, end - start + 1);
+// };
+
+// function insertInterval(intervals, newInterval) {
+//   let res = [];
+//   let i = 0;
+
+//   for (; i < intervals.length; i++) {
+//     const currentInterval = intervals[i];
+
+//     // Edge case 1: stop when i-th interval is greater and no intersection with a newInterval
+//     if (newInterval[1] < currentInterval[0]) {
+//       res.push(newInterval);
+//       break;
+//     }
+
+//     // Edge case 2: if i-th interval is less than a newInterval, push result
+//     if (currentInterval[1] < newInterval[0]) {
+//       res.push(currentInterval);
+//       continue;
+//     }
+
+//     // merge newInterval left-right
+//     newInterval[0] = Math.min(currentInterval[0], newInterval[0]);
+//     newInterval[1] = Math.max(currentInterval[1], newInterval[1]);
+//   }
+
+//   // if new interval at the very end
+//   if (i == intervals.length) {
+//     res.push(newInterval);
+//   }
+
+//   // fill the rest of the intervals
+//   while (i < intervals.length) {
+//     res.push(intervals[i++]);
+//   }
+
+//   return res;
+// }
