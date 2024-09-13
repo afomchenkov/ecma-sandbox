@@ -79,6 +79,17 @@ function mergeSortedArrays(nums1, nums2) {
   const newLength = len1 + len2 - 1;
   let p1 = len1 - 1;
   let p2 = len2 - 1;
+
+  // two pointers solution
+  // commonArr = [..............]
+  //                  |
+  //                  p
+  // arr1      = [..............]
+  //                         |
+  //                         p1
+  // arr2      = [..............]
+  //                     |
+  //                     p2
   
   for (let p = newLength; p >= 0; p--) {
     if (p2 < 0) {
