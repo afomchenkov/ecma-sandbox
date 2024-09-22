@@ -589,27 +589,27 @@ function insertInterval(intervals, newInterval) {
  * --------------------------------------------- 0
  * str = "hsdkfhsdlpncdvd"
  *        |
- * left = 0, right = 0, start = 0, end = 0
+ * left = 0, right = 0, longest = (start = 0, end = 0)
  * { h: 1 }
  * --------------------------------------------- 1
  * str = "hsdkfhsdlpncdvd"
  *        ||
- * left = 0, right = 1, start = 0, end = 1
+ * left = 0, right = 1, longest = (start = 0, end = 1)
  * { h: 1, s: 1 }
  * --------------------------------------------- 2
  * str = "hsdkfhsdlpncdvd"
  *        | |
- * left = 0, right = 2, start = 0, end = 2
+ * left = 0, right = 2, longest = (start = 0, end = 2)
  * { h: 1, s: 1, d: 1 }
  * --------------------------------------------- 3
  * str = "hsdkfhsdlpncdvd"
  *        |  |
- * left = 0, right = 3, start = 0, end = 3
+ * left = 0, right = 3, longest = (start = 0, end = 3)
  * { h: 1, s: 1, d: 1, k: 1 }
  * --------------------------------------------- 4
  * str = "hsdkfhsdlpncdvd"
  *        |   |
- * left = 0, right = 4, start = 0, end = 4
+ * left = 0, right = 4, longest = (start = 0, end = 4)
  * { h: 1, s: 1, d: 1, k: 1, f: 1 }
  * --------------------------------------------- 5
  * str = "hsdkfhsdlpncdvd"
@@ -618,7 +618,7 @@ function insertInterval(intervals, newInterval) {
  * 
  * str = "hsdkfhsdlpncdvd"
  *         |   |
- * left = 1, right = 5, start = 0, end = 4
+ * left = 1, right = 5, longest = (start = 0, end = 4)
  * { h: 1, s: 1, d: 1, k: 1, f: 1 }
  * --------------------------------------------- 6
  * str = "hsdkfhsdlpncdvd"
@@ -627,7 +627,7 @@ function insertInterval(intervals, newInterval) {
  * 
  * str = "hsdkfhsdlpncdvd"
  *          |   |
- * left = 2, right = 6, start = 0, end = 5
+ * left = 2, right = 6, longest = (start = 0, end = 5)
  * { h: 1, s: 1, d: 1, k: 1, f: 1 }
  * --------------------------------------------- 7
  * str = "hsdkfhsdlpncdvd"
@@ -636,27 +636,27 @@ function insertInterval(intervals, newInterval) {
  * 
  * str = "hsdkfhsdlpncdvd"
  *           |   |
- * left = 3, right = 7, start = 0, end = 5
+ * left = 3, right = 7, longest = (start = 0, end = 5)
  * { h: 1, s: 1, d: 1, k: 1, f: 1 }
  * --------------------------------------------- 8
  * str = "hsdkfhsdlpncdvd"
  *           |    |
- * left = 3, right = 8, start = 3, end = 8
+ * left = 3, right = 8, longest = (start = 3, end = 8)
  * { h: 1, s: 1, d: 1, k: 1, f: 1, l: 1 }
  * --------------------------------------------- 9
  * str = "hsdkfhsdlpncdvd"
  *           |     |
- * left = 3, right = 9, start = 3, end = 9
+ * left = 3, right = 9, longest = (start = 3, end = 9)
  * { h: 1, s: 1, d: 1, k: 1, f: 1, l: 1, p: 1 }
  * --------------------------------------------- 10
  * str = "hsdkfhsdlpncdvd"
  *           |      |
- * left = 3, right = 10, start = 3, end = 10
+ * left = 3, right = 10, longest = (start = 3, end = 10)
  * { h: 1, s: 1, d: 1, k: 1, f: 1, l: 1, p: 1, n: 1 }
  * --------------------------------------------- 11
  * str = "hsdkfhsdlpncdvd"
  *           |       |
- * left = 3, right = 11, start = 3, end = 11
+ * left = 3, right = 11, longest = (start = 3, end = 11)
  * { h: 1, s: 1, d: 1, k: 1, f: 1, l: 1, p: 1, n: 1, c: 1 }
  * --------------------------------------------- 12
  * str = "hsdkfhsdlpncdvd"
@@ -664,13 +664,13 @@ function insertInterval(intervals, newInterval) {
  * [[duplicate character]] -> move left pointer till next duplicate + 1
  * str = "hsdkfhsdlpncdvd"
  *                |   |
- * left = 8, right = 12, start = 3, end = 11
+ * left = 8, right = 12, longest = (start = 3, end = 11)
  * rest dict till next duplicate occurrence + 1
  * { h: 0, s: 0, d: 1, k: 0, f: 0, l: 1, p: 1, n: 1, c: 1 }
  * --------------------------------------------- 13
  * str = "hsdkfhsdlpncdvd"
  *                |    |
- * left = 8, right = 13, start = 8, end = 13
+ * left = 8, right = 13, longest = (start = 3, end = 11)
  * { h: 0, s: 0, d: 1, k: 0, f: 0, l: 1, p: 1, n: 1, c: 1, v: 1 }
  * --------------------------------------------- 14
  * 
@@ -705,4 +705,4 @@ function getLongestUniqueSubstr(str = "") {
 
   return str.substr(start, end - start + 1);
 };
-// console.log('Unique substr: ', getLongestUniqueSubstr('hsdkfhsdlpncdvd'));
+console.log('Unique substr: ', getLongestUniqueSubstr('hsdkfhsdlpncdvd'));
