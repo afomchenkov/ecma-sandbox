@@ -590,101 +590,111 @@ function insertInterval(intervals, newInterval) {
  * str = "hsdkfhsdlpncdvd"
  *        |
  * left = 0, right = 0, start = 0, end = 0
- * { }
+ * { h: 1 }
  * --------------------------------------------- 1
  * str = "hsdkfhsdlpncdvd"
  *        ||
  * left = 0, right = 1, start = 0, end = 1
- * { h: 1 }
+ * { h: 1, s: 1 }
  * --------------------------------------------- 2
  * str = "hsdkfhsdlpncdvd"
  *        | |
  * left = 0, right = 2, start = 0, end = 2
- * { h: 1, s: 1 }
+ * { h: 1, s: 1, d: 1 }
  * --------------------------------------------- 3
  * str = "hsdkfhsdlpncdvd"
  *        |  |
  * left = 0, right = 3, start = 0, end = 3
- * { h: 1, s: 1, d: 1 }
+ * { h: 1, s: 1, d: 1, k: 1 }
  * --------------------------------------------- 4
  * str = "hsdkfhsdlpncdvd"
  *        |   |
  * left = 0, right = 4, start = 0, end = 4
- * { h: 1, s: 1, d: 1, k: 1 }
+ * { h: 1, s: 1, d: 1, k: 1, f: 1 }
  * --------------------------------------------- 5
  * str = "hsdkfhsdlpncdvd"
  *        |    |
- * left = 0, right = 5, start = 0, end = 5
+ * [[duplicate character]] -> move left pointer till next duplicate + 1
+ * 
+ * str = "hsdkfhsdlpncdvd"
+ *         |   |
+ * left = 1, right = 5, start = 0, end = 4
  * { h: 1, s: 1, d: 1, k: 1, f: 1 }
  * --------------------------------------------- 6
  * str = "hsdkfhsdlpncdvd"
- *        |     |
- * [[duplicate character]]
- * left = 6, right = 6, start = 0, end = 5
- * { h: 0, s: 0, d: 0, k: 0, f: 0 }
-//  * --------------------------------------------- 7
-//  * str = "hsdkfhsdlpncdvd"
-//  *         |    |
-//  * left = 6, right = 7, start = 0, end = 5
-//  * { h: 0, s: 1, d: 0, k: 0, f: 0 }
-//  * --------------------------------------------- 8
-//  * str = "hsdkfhsdlpncdvd"
-//  *               |
-//  * left = 6, right = 8, start = 0, end = 5
-//  * { h: 0, s: 1, d: 1, k: 0, f: 0 }
-//  * --------------------------------------------- 9
-//  * str = "hsdkfhsdlpncdvd"
-//  *               |
-//  * duplicate character
-//  * left = 6, right = 8, start = 0, end = 5
-//  * { h: 0, s: 1, d: 1, k: 0, f: 0 }
-//  * --------------------------------------------- 10
-//  * str = "hsdkfhsdlpncdvd"
-//  *                |
-//  * duplicate character
-//  * left = 6, right = 9, start = 0, end = 5
-//  * { h: 0, s: 1, d: 1, k: 0, f: 0, l: 1 }
-//  * --------------------------------------------- 11
-//  * str = "hsdkfhsdlpncdvd"
-//  *                 |
-//  * duplicate character
-//  * left = 6, right = 10, start = 0, end = 5
-//  * { h: 0, s: 1, d: 1, k: 0, f: 0, l: 1, p: 1 }
-//  * --------------------------------------------- 12
-//  * str = "hsdkfhsdlpncdvd"
-//  *                  |
-//  * duplicate character
-//  * left = 6, right = 11, start = 0, end = 5
-//  * { h: 0, s: 1, d: 1, k: 0, f: 0, l: 1, p: 1, n: 1 }
-//  * --------------------------------------------- 13
-//  * str = "hsdkfhsdlpncdvd"
-//  *                   |
-//  * duplicate character
-//  * left = 6, right = 11, start = 0, end = 5
-//  * { h: 0, s: 1, d: 1, k: 0, f: 0, l: 1, p: 1, n: 1, c: 1 }
-//  * 
-//  * ..... and so on
+ *         |    |
+ * [[duplicate character]] -> move left pointer till next duplicate + 1
+ * 
+ * str = "hsdkfhsdlpncdvd"
+ *          |   |
+ * left = 2, right = 6, start = 0, end = 5
+ * { h: 1, s: 1, d: 1, k: 1, f: 1 }
+ * --------------------------------------------- 7
+ * str = "hsdkfhsdlpncdvd"
+ *          |    |
+ * [[duplicate character]] -> move left pointer till next duplicate + 1
+ * 
+ * str = "hsdkfhsdlpncdvd"
+ *           |   |
+ * left = 3, right = 7, start = 0, end = 5
+ * { h: 1, s: 1, d: 1, k: 1, f: 1 }
+ * --------------------------------------------- 8
+ * str = "hsdkfhsdlpncdvd"
+ *           |    |
+ * left = 3, right = 8, start = 3, end = 8
+ * { h: 1, s: 1, d: 1, k: 1, f: 1, l: 1 }
+ * --------------------------------------------- 9
+ * str = "hsdkfhsdlpncdvd"
+ *           |     |
+ * left = 3, right = 9, start = 3, end = 9
+ * { h: 1, s: 1, d: 1, k: 1, f: 1, l: 1, p: 1 }
+ * --------------------------------------------- 10
+ * str = "hsdkfhsdlpncdvd"
+ *           |      |
+ * left = 3, right = 10, start = 3, end = 10
+ * { h: 1, s: 1, d: 1, k: 1, f: 1, l: 1, p: 1, n: 1 }
+ * --------------------------------------------- 11
+ * str = "hsdkfhsdlpncdvd"
+ *           |       |
+ * left = 3, right = 11, start = 3, end = 11
+ * { h: 1, s: 1, d: 1, k: 1, f: 1, l: 1, p: 1, n: 1, c: 1 }
+ * --------------------------------------------- 12
+ * str = "hsdkfhsdlpncdvd"
+ *            |       |
+ * [[duplicate character]] -> move left pointer till next duplicate + 1
+ * str = "hsdkfhsdlpncdvd"
+ *                |   |
+ * left = 8, right = 12, start = 3, end = 11
+ * rest dict till next duplicate occurrence + 1
+ * { h: 0, s: 0, d: 1, k: 0, f: 0, l: 1, p: 1, n: 1, c: 1 }
+ * --------------------------------------------- 13
+ * str = "hsdkfhsdlpncdvd"
+ *                |    |
+ * left = 8, right = 13, start = 8, end = 13
+ * { h: 0, s: 0, d: 1, k: 0, f: 0, l: 1, p: 1, n: 1, c: 1, v: 1 }
+ * --------------------------------------------- 14
+ * 
+ * ..... and so on
  * 
  * @param {*} str 
  * @returns 
  */
-function getLongestUniqueSubstr(str) {
+function getLongestUniqueSubstr(str = "") {
   let n = str.length;
   let window = {};
   let start = 0;
   let end = 0;
 
   for (let left = 0, right = 0; right < n; ++right) {
-    console.log('>> ', { left, right, window });
-    // once we meet a duplicate, shift left pointer to the right, and start a new window
-    if (window[str[right]]) {
-      while (str[left] != str[right]) {
-        window[str[left++]] = false;
+    let rightChar = str.charAt(right);
+    // once we meet a duplicate, shift left pointer till we find next char occurrence + 1
+    if (window[rightChar]) {
+      while (str.charAt(left) != rightChar) {
+        window[str.charAt(left++)] = 0;
       }
-      console.log('left<>right ', { left, right });
       left++;
     } else {
-      window[str[right]] = true;
+      window[rightChar] = 1;
       // set max distance for unique substring
       if (end - start < right - left) {
         start = left;
@@ -695,4 +705,4 @@ function getLongestUniqueSubstr(str) {
 
   return str.substr(start, end - start + 1);
 };
-console.log('Unique substr: ', getLongestUniqueSubstr('hsdkfhsdlpncdvd'));
+// console.log('Unique substr: ', getLongestUniqueSubstr('hsdkfhsdlpncdvd'));

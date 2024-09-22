@@ -1,0 +1,11 @@
+{
+  "name": "ecma-sandbox",
+  "version": "1.0.0",
+  "description": "## ECMAScript Apr21 2024 https://tc39.es/ecma262/",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
