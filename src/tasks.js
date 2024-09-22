@@ -547,64 +547,152 @@ function findStringCombinationsNoOverlaps(s) {
 }
 // console.log(findStringCombinationsNoOverlaps("aads"));
 
-// TODO: recap
-// function getUniqueSubstr(str) {
-//   let n = str.length;
-//   let window = {};
-//   let start = 0;
-//   let end = 0;
+function insertInterval(intervals, newInterval) {
+  let res = [];
+  let i = 0;
 
-//   for (let left = 0, right = 0; right < n; ++right) {
-//     if (window[str[right]]) {
-//       while (str[left] != str[right]) {
-//         window[str[left++]] = false;
-//       }
-//       left++;
-//     } else {
-//       window[str[right]] = true;
-//       if (end - start < right - left) {
-//         start = left;
-//         end = right;
-//       }
-//     }
-//   }
+  for (; i < intervals.length; i++) {
+    const currentInterval = intervals[i];
 
-//   return str.substr(start, end - start + 1);
-// };
+    // Edge case 1: stop when i-th interval is greater and no intersection with a newInterval
+    if (newInterval[1] < currentInterval[0]) {
+      res.push(newInterval);
+      break;
+    }
 
-// function insertInterval(intervals, newInterval) {
-//   let res = [];
-//   let i = 0;
+    // Edge case 2: if i-th interval is less than a newInterval, push result
+    if (currentInterval[1] < newInterval[0]) {
+      res.push(currentInterval);
+      continue;
+    }
 
-//   for (; i < intervals.length; i++) {
-//     const currentInterval = intervals[i];
+    // merge newInterval left-right
+    newInterval[0] = Math.min(currentInterval[0], newInterval[0]);
+    newInterval[1] = Math.max(currentInterval[1], newInterval[1]);
+  }
 
-//     // Edge case 1: stop when i-th interval is greater and no intersection with a newInterval
-//     if (newInterval[1] < currentInterval[0]) {
-//       res.push(newInterval);
-//       break;
-//     }
+  // if new interval at the very end
+  if (i == intervals.length) {
+    res.push(newInterval);
+  }
 
-//     // Edge case 2: if i-th interval is less than a newInterval, push result
-//     if (currentInterval[1] < newInterval[0]) {
-//       res.push(currentInterval);
-//       continue;
-//     }
+  // fill the rest of the intervals
+  while (i < intervals.length) {
+    res.push(intervals[i++]);
+  }
 
-//     // merge newInterval left-right
-//     newInterval[0] = Math.min(currentInterval[0], newInterval[0]);
-//     newInterval[1] = Math.max(currentInterval[1], newInterval[1]);
-//   }
+  return res;
+}
 
-//   // if new interval at the very end
-//   if (i == intervals.length) {
-//     res.push(newInterval);
-//   }
+/**
+ * Sliding window, example:
+ * --------------------------------------------- 0
+ * str = "hsdkfhsdlpncdvd"
+ *        |
+ * left = 0, right = 0, start = 0, end = 0
+ * { }
+ * --------------------------------------------- 1
+ * str = "hsdkfhsdlpncdvd"
+ *        ||
+ * left = 0, right = 1, start = 0, end = 1
+ * { h: 1 }
+ * --------------------------------------------- 2
+ * str = "hsdkfhsdlpncdvd"
+ *        | |
+ * left = 0, right = 2, start = 0, end = 2
+ * { h: 1, s: 1 }
+ * --------------------------------------------- 3
+ * str = "hsdkfhsdlpncdvd"
+ *        |  |
+ * left = 0, right = 3, start = 0, end = 3
+ * { h: 1, s: 1, d: 1 }
+ * --------------------------------------------- 4
+ * str = "hsdkfhsdlpncdvd"
+ *        |   |
+ * left = 0, right = 4, start = 0, end = 4
+ * { h: 1, s: 1, d: 1, k: 1 }
+ * --------------------------------------------- 5
+ * str = "hsdkfhsdlpncdvd"
+ *        |    |
+ * left = 0, right = 5, start = 0, end = 5
+ * { h: 1, s: 1, d: 1, k: 1, f: 1 }
+ * --------------------------------------------- 6
+ * str = "hsdkfhsdlpncdvd"
+ *        |     |
+ * [[duplicate character]]
+ * left = 6, right = 6, start = 0, end = 5
+ * { h: 0, s: 0, d: 0, k: 0, f: 0 }
+//  * --------------------------------------------- 7
+//  * str = "hsdkfhsdlpncdvd"
+//  *         |    |
+//  * left = 6, right = 7, start = 0, end = 5
+//  * { h: 0, s: 1, d: 0, k: 0, f: 0 }
+//  * --------------------------------------------- 8
+//  * str = "hsdkfhsdlpncdvd"
+//  *               |
+//  * left = 6, right = 8, start = 0, end = 5
+//  * { h: 0, s: 1, d: 1, k: 0, f: 0 }
+//  * --------------------------------------------- 9
+//  * str = "hsdkfhsdlpncdvd"
+//  *               |
+//  * duplicate character
+//  * left = 6, right = 8, start = 0, end = 5
+//  * { h: 0, s: 1, d: 1, k: 0, f: 0 }
+//  * --------------------------------------------- 10
+//  * str = "hsdkfhsdlpncdvd"
+//  *                |
+//  * duplicate character
+//  * left = 6, right = 9, start = 0, end = 5
+//  * { h: 0, s: 1, d: 1, k: 0, f: 0, l: 1 }
+//  * --------------------------------------------- 11
+//  * str = "hsdkfhsdlpncdvd"
+//  *                 |
+//  * duplicate character
+//  * left = 6, right = 10, start = 0, end = 5
+//  * { h: 0, s: 1, d: 1, k: 0, f: 0, l: 1, p: 1 }
+//  * --------------------------------------------- 12
+//  * str = "hsdkfhsdlpncdvd"
+//  *                  |
+//  * duplicate character
+//  * left = 6, right = 11, start = 0, end = 5
+//  * { h: 0, s: 1, d: 1, k: 0, f: 0, l: 1, p: 1, n: 1 }
+//  * --------------------------------------------- 13
+//  * str = "hsdkfhsdlpncdvd"
+//  *                   |
+//  * duplicate character
+//  * left = 6, right = 11, start = 0, end = 5
+//  * { h: 0, s: 1, d: 1, k: 0, f: 0, l: 1, p: 1, n: 1, c: 1 }
+//  * 
+//  * ..... and so on
+ * 
+ * @param {*} str 
+ * @returns 
+ */
+function getLongestUniqueSubstr(str) {
+  let n = str.length;
+  let window = {};
+  let start = 0;
+  let end = 0;
 
-//   // fill the rest of the intervals
-//   while (i < intervals.length) {
-//     res.push(intervals[i++]);
-//   }
+  for (let left = 0, right = 0; right < n; ++right) {
+    console.log('>> ', { left, right, window });
+    // once we meet a duplicate, shift left pointer to the right, and start a new window
+    if (window[str[right]]) {
+      while (str[left] != str[right]) {
+        window[str[left++]] = false;
+      }
+      console.log('left<>right ', { left, right });
+      left++;
+    } else {
+      window[str[right]] = true;
+      // set max distance for unique substring
+      if (end - start < right - left) {
+        start = left;
+        end = right;
+      }
+    }
+  }
 
-//   return res;
-// }
+  return str.substr(start, end - start + 1);
+};
+console.log('Unique substr: ', getLongestUniqueSubstr('hsdkfhsdlpncdvd'));
