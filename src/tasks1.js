@@ -151,3 +151,69 @@ function longestUniqueSubstring(str) {
 }
 let strHere = 'mjqjpqmgbljsphdztnvjfqwrcgsmlb';
 
+function dijkstra(edges, start, end) {
+  const graph = new Map();
+
+  for (const [from, to, weight] of edges) {
+    if (graph.has(from)) {
+      graph.get(from).push({ to, weight });
+    } else {
+      graph.set(from, [{ to, weight }]);
+    }
+  }
+
+  let visited = new Set();
+  let heap = [[0, [], start]]; // weight, path, node
+
+  while (heap.length) {
+    let [w, path, v1] = heap.pop();
+
+    if (!visited.has(v1)) {
+      visited.add(v1);
+
+      path = [path, v1];
+      if (v1 == end) {
+        return [w, path];
+      }
+
+      for (const { to, weight } of graph.get(v1) || []) {
+        if (!visited.has(to)) {
+          heap.push([w + weight, path, to]);
+          heap.sort((a, b) => a[1] < b[1]);
+        }
+      }
+    }
+  }
+
+  return [];
+}
+
+function findIslands(grid) {
+  let rows = grid.length;
+  let cols = grid[0].length;
+  let islandsCount = 0;
+
+  function dfs(i, j, grid) {
+    if (i < 0 || i >= rows || j < 0 || j >= cols || grid[i][j] == '1') {
+      return;
+    }
+
+    grid[i][j] = '0';
+
+    dfs(i + 1, j, grid);
+    dfs(i - 1, j, grid);
+    dfs(i, j + 1, grid);
+    dfs(i, j - 1, grid);
+  }
+
+  for (let i = 0; i < rows; ++i) {
+    for (let j = 0; j < cols; ++j) {
+      if (grid[i][j] == '1') {
+        dfs(i, j, grid);
+        islandsCount++;
+      }
+    }
+  }
+
+  return islandsCount;
+}
