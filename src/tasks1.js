@@ -34,6 +34,8 @@ function subsetsBacktrack(arr) {
   backtrack([], 0);
   return result;
 }
+console.log('Subsets: ', subsetsBacktrack([2, 1, 1]));
+
 // the collection can have duplicates [2, 1, 1, 9, 4, 9]
 // generate subsets without duplicate subsets
 function subsetsWithDuplicates(nums) {
@@ -60,6 +62,7 @@ function subsetsWithDuplicates(nums) {
 
   return result;
 }
+console.log('Subsets without duplicates: ', subsetsWithDuplicates([2, 1, 1]));
 
 function permute(nums) {
   let result = [];
@@ -81,6 +84,44 @@ function permute(nums) {
 
   return result;
 }
+console.log('Permute: ', permute([2, 1, 1]));
+
+function permuteUnique(nums) {
+  let result = [];
+  let len = nums.length;
+  // count number occurrences
+  let counter = new Map();
+
+  for (let num of nums) {
+    if (!counter.has(num)) {
+      counter.set(num, 0);
+    }
+    counter.set(num, counter.get(num) + 1);
+  }
+
+  function backtrack(curr) {
+    if (curr.length == len) {
+      result.push([...curr]);
+      return;
+    }
+
+    for (let [num, count] of counter.entries()) {
+      if (count == 0) {
+        continue;
+      }
+
+      curr.push(num);
+      counter.set(num, count - 1);
+      backtrack(curr);
+      curr.pop();
+      counter.set(num, count);
+    }
+  }
+  backtrack([]);
+
+  return result;
+}
+console.log('Permute without duplicates: ', permuteUnique([2, 1, 1]));
 
 function longestUniqueSubstring(str) {
   let len = str.length;
