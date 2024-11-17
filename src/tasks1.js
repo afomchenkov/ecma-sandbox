@@ -1,0 +1,112 @@
+function generateSubsets(arr) {
+  let len = arr.length;
+  let result = [];
+
+  function generate(curr, idx) {
+    if (idx == len) {
+      result.push([...curr]);
+      return;
+    }
+
+    curr.push(arr[idx]);
+    generate(curr, idx + 1);
+    curr.pop();
+    generate(curr, idx + 1);
+  }
+  generate([], 0);
+
+  return result;
+}
+
+function subsetsBacktrack(arr) {
+  let result = [];
+  let len = arr.length;
+
+  function backtrack(curr, i) {
+    result.push([...curr]);
+
+    for (let j = i; j < len; ++j) {
+      curr.push(arr[j]);
+      backtrack(curr, j + 1);
+      curr.pop();
+    }
+  }
+  backtrack([], 0);
+  return result;
+}
+// the collection can have duplicates [2, 1, 1, 9, 4, 9]
+// generate subsets without duplicate subsets
+function subsetsWithDuplicates(nums) {
+  let len = nums.length;
+  let result = [];
+
+  nums.sort((a, b) => a - b);
+
+  function backtrack(curr, i) {
+    result.push([...curr]);
+
+    for (let j = i; j < len; ++j) {
+      // check if duplicate, continue
+      if (j != i && nums[j - 1] == nums[j]) {
+        continue;
+      }
+
+      curr.push(nums[j]);
+      backtrack(curr, j + 1);
+      curr.pop();
+    }
+  }
+  backtrack([], 0);
+
+  return result;
+}
+
+function permute(nums) {
+  let result = [];
+  let len = nums.length;
+
+  function _permute(n, curr) {
+    if (curr.length == len) {
+      result.push([...curr]);
+      return;
+    }
+
+    for (let i = 0; i < n.length; ++i) {
+      const clone = [...n];
+      const next = clone.splice(i, 1);
+      _permute(clone, curr.concat(next));
+    }
+  }
+  _permute(nums, []);
+
+  return result;
+}
+
+function longestUniqueSubstring(str) {
+  let len = str.length;
+  let window = {};
+  let start = 0;
+  let end = 0;
+
+  for (let left = 0, right = 0; right < len; right++) {
+    let char = str.charAt(right);
+
+    // encountered duplicate [... left ... right ...]
+    if (window[char]) {
+      while (str[left] != str[right]) {
+        window[str[left++]] = false;
+      }
+      left++;
+    } else {
+      window[char] = true;
+      if (end - start < right - left) {
+        start = left;
+        end = right;
+      }
+    }
+  }
+
+  return str.substr(start, end - start + 1);
+}
+let strHere = 'mjqjpqmgbljsphdztnvjfqwrcgsmlb';
+
