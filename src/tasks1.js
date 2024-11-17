@@ -34,7 +34,7 @@ function subsetsBacktrack(arr) {
   backtrack([], 0);
   return result;
 }
-console.log('Subsets: ', subsetsBacktrack([2, 1, 1]));
+// console.log('Subsets: ', subsetsBacktrack([2, 1, 1]));
 
 // the collection can have duplicates [2, 1, 1, 9, 4, 9]
 // generate subsets without duplicate subsets
@@ -62,7 +62,7 @@ function subsetsWithDuplicates(nums) {
 
   return result;
 }
-console.log('Subsets without duplicates: ', subsetsWithDuplicates([2, 1, 1]));
+// console.log('Subsets without duplicates: ', subsetsWithDuplicates([2, 1, 1]));
 
 function permute(nums) {
   let result = [];
@@ -84,7 +84,7 @@ function permute(nums) {
 
   return result;
 }
-console.log('Permute: ', permute([2, 1, 1]));
+// console.log('Permute: ', permute([2, 1, 1]));
 
 function permuteUnique(nums) {
   let result = [];
@@ -121,7 +121,7 @@ function permuteUnique(nums) {
 
   return result;
 }
-console.log('Permute without duplicates: ', permuteUnique([2, 1, 1]));
+// console.log('Permute without duplicates: ', permuteUnique([2, 1, 1]));
 
 function longestUniqueSubstring(str) {
   let len = str.length;
@@ -216,4 +216,9 @@ function findIslands(grid) {
   }
 
   return islandsCount;
+}
+
+function getNextChar(char = 'a') {
+  if (char === 'z') return 'a';
+  return String.fromCharCode(char.charCodeAt(0) + 1);
 }
