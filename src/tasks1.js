@@ -222,3 +222,15 @@ function getNextChar(char = 'a') {
   if (char === 'z') return 'a';
   return String.fromCharCode(char.charCodeAt(0) + 1);
 }
+
+function maxAdjacentSubarrKadanes(arr) {
+  let max = arr[0];
+  let maxHere = arr[0];
+
+  for (let i = 1; i < arr.length; ++i) {
+    maxHere = Math.max(maxHere + arr[i], arr[i]);
+    max = Math.max(max, maxHere);
+  }
+
+  return max;
+}
