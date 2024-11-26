@@ -290,12 +290,12 @@ function isValidBST(root) {
     if (!root) {
       return true;
     }
-    if (root.val >= max || root.val <= min) {
+    if (root.data >= max || root.data <= min) {
       return false;
     }
     return (
-      isValid(root.left, min, root.val) && // for left subtree the root is max
-      isValid(root.right, root.val, max) // for right substree the root is min
+      isValid(root.left, min, root.data) && // for left subtree the root is max
+      isValid(root.right, root.data, max) // for right substree the root is min
     );
   }
   return isValid(root, -Infinity, Infinity);
