@@ -18,62 +18,7 @@ const root = new ListNode(
 
 // ------------------------------------------------------------------
 
-function addTwoNumbers(l1, l2) {
-  let dummyHead = new ListNode(-1);
-  let curr = dummyHead;
-  let carry = 0;
-
-  while (l1 || l2 || carry != 0) {
-    let x = l1 != null ? l1.val : 0;
-    let y = l2 != null ? l2.val : 0;
-
-    let sum = carry + x + y;
-
-    carry = parseInt(sum / 10);
-    curr.next = new ListNode(sum % 10);
-    curr = curr.next;
-
-    if (l1) {
-      l1 = l1.next;
-    }
-    if (l2) {
-      l2 = l2.next;
-    }
-  }
-
-  return dummyHead.next;
-}
-
-const removeElement = (head, val) => {
-  if (!head) {
-    return nullptr;
-  }
-
-  if (head && !head.next) {
-    if (head.val == val) {
-      return nullptr;
-    } else {
-      return head;
-    }
-  }
-
-  let dummy = new Node(0, head);
-  let prev = dummy;
-
-  while (head) {
-    if (head.val == val) {
-      prev.next = head.next;
-      head = prev;
-    }
-
-    prev = head;
-    head = head.next;
-  }
-
-  return dummy.next;
-};
-
-function hasCycle(head) {
+function hasCycle1(head) {
   if (head == null || head.next == null) {
     return false;
   }
@@ -88,7 +33,7 @@ function hasCycle(head) {
   return fast == slow;
 }
 
-function hasListCycle(head) {
+function hasCycle2(head) {
   if (head == null || head.next == null) {
     return false;
   }
@@ -107,44 +52,6 @@ function hasListCycle(head) {
   }
   return false;
 }
-
-const mergeTwoLists = (list1, list2) => {
-  if (!list1 && !list2) {
-    return nullptr;
-  }
-
-  let head = nullptr;
-  if (list1.val < list2.val) {
-    head = list1;
-    list1 = list1.next;
-  } else {
-    head = list2;
-    list2 = list2.next;
-  }
-  let curr = head;
-
-  while (list1 || list2) {
-    if (!list1) {
-      curr.next = list2;
-      list2 = list2.next;
-    } else if (!list2) {
-      curr.next = list1;
-      list1 = list1.next;
-    } else {
-      if (list1.val < list2.val) {
-        curr.next = list1;
-        list1 = list1.next;
-      } else {
-        curr.next = list2;
-        list2 = list2.next;
-      }
-    }
-
-    curr = curr.next;
-  }
-
-  return head;
-};
 
 // Given a sorted linked list, delete all duplicates such that each element appear only once.
 function deleteDuplicates(head) {
@@ -200,3 +107,96 @@ function partitionList(head, x) {
   t1.next = null;
   return lt.next;
 }
+
+function addTwoNumbers(l1, l2) {
+  let dummyHead = new ListNode(-1);
+  let curr = dummyHead;
+  let carry = 0;
+
+  while (l1 || l2 || carry != 0) {
+    let x = l1 != null ? l1.val : 0;
+    let y = l2 != null ? l2.val : 0;
+
+    let sum = carry + x + y;
+
+    carry = parseInt(sum / 10);
+    curr.next = new ListNode(sum % 10);
+    curr = curr.next;
+
+    if (l1) {
+      l1 = l1.next;
+    }
+    if (l2) {
+      l2 = l2.next;
+    }
+  }
+
+  return dummyHead.next;
+}
+
+const removeElement = (head, val) => {
+  if (!head) {
+    return nullptr;
+  }
+
+  if (head && !head.next) {
+    if (head.val == val) {
+      return nullptr;
+    } else {
+      return head;
+    }
+  }
+
+  let dummy = new Node(0, head);
+  let prev = dummy;
+
+  while (head) {
+    if (head.val == val) {
+      prev.next = head.next;
+      head = prev;
+    }
+
+    prev = head;
+    head = head.next;
+  }
+
+  return dummy.next;
+};
+
+const mergeTwoLists = (list1, list2) => {
+  if (!list1 && !list2) {
+    return nullptr;
+  }
+
+  let head = nullptr;
+  if (list1.val < list2.val) {
+    head = list1;
+    list1 = list1.next;
+  } else {
+    head = list2;
+    list2 = list2.next;
+  }
+  let curr = head;
+
+  while (list1 || list2) {
+    if (!list1) {
+      curr.next = list2;
+      list2 = list2.next;
+    } else if (!list2) {
+      curr.next = list1;
+      list1 = list1.next;
+    } else {
+      if (list1.val < list2.val) {
+        curr.next = list1;
+        list1 = list1.next;
+      } else {
+        curr.next = list2;
+        list2 = list2.next;
+      }
+    }
+
+    curr = curr.next;
+  }
+
+  return head;
+};

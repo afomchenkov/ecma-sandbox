@@ -26,7 +26,7 @@ function createSpiralMatrix(n) {
     right -= 1;
 
     for (let k = right; k >= left; --k) {
-    matr[bottom][k] = count++;
+      matr[bottom][k] = count++;
     }
     bottom -= 1;
 
@@ -37,4 +37,28 @@ function createSpiralMatrix(n) {
   }
 
   return matr;
+}
+
+function subsets(nums) {
+  let result = [];
+  if (nums.length == 0) {
+    return result;
+  }
+
+  function bt(start, curr, nums) {
+    result.push([...curr]);
+
+    for (let i = start; i < nums.length; ++i) {
+      if (i > start && nums[i - 1] == nums[i]) {
+        continue;
+      }
+      curr.push(nums[i]);
+      bt(i + 1, curr, nums);
+      curr.pop();
+    }
+  }
+
+  nums.sort((a, b) => a - b);
+  bt(0, [], nums);
+  return result;
 }
