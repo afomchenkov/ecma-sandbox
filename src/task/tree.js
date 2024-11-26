@@ -32,15 +32,15 @@ root.right.left.right = new Node(9);
 
 // ------------------------------------------------------------
 
-function printPostorder(node) {
+function printPreorder(node) {
   if (node == null) {
     return;
   }
 
-  printPostorder(node.left);
-  printPostorder(node.right);
-  // print root last
+  // handle root first
   console.log(node.data);
+  printPreorder(node.left);
+  printPreorder(node.right);
 }
 
 function printInorder(node) {
@@ -49,20 +49,20 @@ function printInorder(node) {
   }
 
   printInorder(node.left);
-  // print root in order
+  // hanle root in order
   console.log(node.data);
   printInorder(node.right);
 }
 
-function printPreorder(node) {
+function printPostorder(node) {
   if (node == null) {
     return;
   }
 
-  // print root first
+  printPostorder(node.left);
+  printPostorder(node.right);
+  // handle root last
   console.log(node.data);
-  printPreorder(node.left);
-  printPreorder(node.right);
 }
 
 // ------------------------------------------------------------
