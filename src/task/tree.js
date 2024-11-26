@@ -79,7 +79,7 @@ function printLeafToRoot(root) {
 
     path.push(node.data);
     if (isLeaf(node)) {
-      console.log([...path]);
+      console.log([...path].reverse());
     }
 
     _printLeafToRootPaths(node.left, path);
