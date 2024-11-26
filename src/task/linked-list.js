@@ -170,3 +170,33 @@ function deleteDuplicates(head) {
 
   return h;
 }
+
+/**
+ * Given a linked list and a value x, partition it such that all nodes
+ * less than x come before nodes greater than or equal to x.
+ *
+ * Example:
+ * list = 1 -> 4 -> 3 -> 2 -> 5 -> 2, x = 3
+ * return 1 -> 2 -> 2 -> 4 -> 3 -> 5
+ */
+function partitionList(head, x) {
+  let gt = new ListNode(-1);
+  let lt = new ListNode(-1);
+  let t1 = gt; // list with greater or equal nodes
+  let t2 = lt; // list for less than nodes
+
+  while (head) {
+    if (head.val < x) {
+      t2.next = head;
+      t2 = t2.next;
+    } else {
+      t1.next = head;
+      t1 = t1.next;
+    }
+    head = head.next;
+  }
+
+  t2.next = gt.next; // append greater part
+  t1.next = null;
+  return lt.next;
+}
