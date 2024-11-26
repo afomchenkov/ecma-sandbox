@@ -315,7 +315,7 @@ function isSymmetric(root) {
     if ((!left && right) || (!right && left)) {
       return false;
     }
-    if (left.value !== right.value) {
+    if (left.data !== right.data) {
       return false;
     }
 
