@@ -28,7 +28,9 @@ root.right.left = node6;
 root.right.right = new Node(7);
 
 root.right.left.left = new Node(8);
-root.right.left.right = new Node(9);
+const node9 = new Node(9);
+// node9.left = new Node(100);
+root.right.left.right = node9;
 
 // ------------------------------------------------------------
 
@@ -351,7 +353,6 @@ function lowestCommonAncestor(root, p, q) {
   }
   return left == null ? right : left;
 }
-
 // console.log(lowestCommonAncestor(root, root.left.right, root.right.left));
 
 function minDepth(root) {
@@ -390,3 +391,19 @@ function upsideDownBinaryTree(root) {
 
   return newRoot;
 }
+
+function maxDepth(root) {
+  function _max(root, depth) {
+    if (!root) {
+      return depth;
+    }
+
+    const l = _max(root.left, depth + 1);
+    const r = _max(root.right, depth + 1);
+
+    return Math.max(l, r);
+  }
+
+  return _max(root, 0);
+}
+console.log(maxDepth(root));
