@@ -200,3 +200,47 @@ const mergeTwoLists = (list1, list2) => {
 
   return head;
 };
+
+function oddEvenList(head) {
+  let odd = new ListNode();
+  let even = new ListNode();
+
+  let oddPtr = odd;
+  let evenPtr = even;
+  let idx = 0;
+
+  while (head) {
+    if (idx == 0 || idx % 2 == 0) {
+      oddPtr.next = head;
+      oddPtr = oddPtr.next;
+    } else {
+      evenPtr.next = head;
+      evenPtr = evenPtr.next;
+    }
+
+    head = head.next;
+    idx += 1;
+  }
+
+  evenPtr.next = null;
+  oddPtr.next = even.next;
+  return odd.next;
+}
+
+function oddEvemList2(head) {
+  if (head == null) {
+    return null;
+  }
+
+  let odd = head;
+  let even = head.next;
+  let evenHead = even;
+  while (even != null && even.next != null) {
+    odd.next = even.next;
+    odd = odd.next;
+    even.next = odd.next;
+    even = even.next;
+  }
+  odd.next = evenHead;
+  return head;
+}

@@ -62,3 +62,22 @@ function subsets(nums) {
   bt(0, [], nums);
   return result;
 }
+
+function subarraySumK(nums, k) {
+  let count = 0, cumulativeSum = 0;
+  let map = {};
+  map[0] = 1;
+
+  for (let i = 0; i < nums.length; i++) {
+      cumulativeSum += nums[i];
+
+      if (map[cumulativeSum - k]) {
+          count += map[cumulativeSum - k];
+      }
+
+      const next = map[cumulativeSum] || 0;
+      map[cumulativeSum] = next + 1;
+  }
+
+  return count;
+};
