@@ -76,6 +76,13 @@ const edges = [
 // each edge.
 // This way, you can determine the in-degree of each node before starting the sorting process.
 
+// Applications tasks:
+// - Course sequencing
+// - Management of software dependencies
+// - Scheduling tasks
+// - Data processing
+// - Circuit design
+
 function sortGraph(n, edges) {
     function topologicalSort(adj, edgesCount) {
         const indegree = new Array(edgesCount).fill(0);
@@ -86,6 +93,7 @@ function sortGraph(n, edges) {
             }
         }
 
+        // find the root node with zero incoming edges
         const q = [];
         for (let i = 0; i < edgesCount; i++) {
             if (indegree[i] === 0) {
