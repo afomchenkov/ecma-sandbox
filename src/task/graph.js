@@ -93,7 +93,7 @@ function sortGraph(n, edges) {
             }
         }
 
-        // find the root node with zero incoming edges
+        // find the root node(s) with zero incoming edges
         const q = [];
         for (let i = 0; i < edgesCount; i++) {
             if (indegree[i] === 0) {
