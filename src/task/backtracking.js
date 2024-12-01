@@ -192,4 +192,40 @@ function findWord3(board, word) {
   }
 
   return false;
+}
+
+// HARD: Given a string s and a dictionary of words dict, add spaces in s to construct a
+// sentence where each word is a valid dictionary word. Return all such possible sentences.
+//
+// s = "catsanddog",
+// dict = ["cat", "cats", "and", "sand", "dog"].
+const wordBreak = (s, wordDict) => {
+  const hash = new Map(); // <string, linked_list<string>>
+
+  const dfs = (sentence, wordDict, hash) => {
+    if (hash.has(sentence)) {
+      return hash.get(sentence);
+    }
+
+    let res = [];
+    if (sentence.length == 0) {
+      res.push("");
+      return res;
+    }
+
+    for (let word of wordDict) {
+      if (sentence.startsWith(word)) {
+        let sublist = dfs(sentence.substring(word.length), wordDict, hash);
+
+        for (let sub of sublist) {
+          res.push(word + (sub.length ? " " : "") + sub);
+        }
+      }
+    }
+
+    hash.set(sentence, res);
+    return res;
+  };
+
+  return dfs(s, wordDict, hash);
 };
