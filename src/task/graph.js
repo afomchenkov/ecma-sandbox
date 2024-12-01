@@ -128,4 +128,6 @@ function sortGraph(n, edges) {
 
     return topologicalSort(adjacencyList, n);
 }
-console.log('Topological sort: ', sortGraph(6, [[0, 1], [1, 2], [2, 3], [4, 5], [5, 1], [5, 2]]));
+const gr1 = [[0, 1], [1, 2], [2, 3], [4, 5], [5, 1], [5, 2]];
+const gr2 = [[2, 3], [3, 1], [4, 0], [4, 1], [5, 0], [5, 2]];
+console.log('Topological sort: ', sortGraph(6, gr2));
