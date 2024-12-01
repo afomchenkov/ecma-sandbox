@@ -70,11 +70,18 @@ const edges = [
 // removing them from the graph, and updating the incoming edges of the remaining vertices.
 // This process continues until all vertices have been ordered.
 // Function to return list containing vertices in Topological order.
+//
+// To find the in-degree of each node by initially calculating the number of incoming edges to each node.
+// Iterate through all the edges in the graph and increment the in-degree of the destination node for
+// each edge.
+// This way, you can determine the in-degree of each node before starting the sorting process.
+
 function sortGraph(n, edges) {
     function topologicalSort(adj, edgesCount) {
         const indegree = new Array(edgesCount).fill(0);
         for (let i = 0; i < edgesCount; i++) {
             for (const vertex of adj[i]) {
+                // count the total number of incoming edges
                 indegree[vertex]++;
             }
         }
