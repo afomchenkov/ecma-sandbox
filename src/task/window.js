@@ -47,5 +47,64 @@
     return result;
   }
 
-  console.log(findAllAnagrams("cbaebabacd", "abc"));
+  // console.log(findAllAnagrams("cbaebabacd", "abc"));
 }
+
+function allAnagramsHash(s, p) {
+  let ns = s.length;
+  let np = p.length;
+
+  if (ns < np) {
+    return [];
+  }
+  
+  let pCount = {};
+  let sCount = {};
+  // Build a reference hashmap using string p
+  for (let ch of p) {
+    if (pCount[ch]) {
+      pCount[ch]++;
+    } else {
+      pCount[ch] = 1;
+    }
+  }
+
+  function equals(a, b) {
+    for (let k of Object.keys(a)) {
+      if (a[k] != b[k]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  let output = [];
+  for (let i = 0; i < ns; ++i) {
+    // Add one more letter on the right side of the window
+    let ch = s.charAt(i);
+    if (sCount[ch]) {
+      sCount[ch]++;
+    } else {
+      sCount[ch] = 1;
+    }
+
+    // Remove one letter from the left side of the window
+    if (i >= np) {
+      ch = s.charAt(i - np);
+      if (sCount[ch] == 1) {
+        delete sCount[ch];
+      } else {
+        sCount[ch]--;
+      }
+    }
+
+    // Compare hashmap in the sliding window with the reference hashmap
+    if (equals(pCount, sCount)) {
+      output.push(i - np + 1);
+    }
+  }
+
+  return output;
+}
+
+console.log(allAnagramsHash("cbaebabacd", "abc"));
